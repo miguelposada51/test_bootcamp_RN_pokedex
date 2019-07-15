@@ -1,7 +1,8 @@
 import React from "react";
-import { View, Text, StyleSheet, TextInput, Button, Alert } from "react-native";
+import { View, Text, StyleSheet, TextInput, Button, Alert, AsyncStorage } from "react-native";
 import { createStackNavigator, createAppContainer } from "react-navigation";
 import  Home  from "./app/screens/Home";
+import  SignUp  from "./app/screens/SignUp";
 import  PokeCard  from "./app/components/PokeCard";
 import  Pokemon  from "./app/components/Pokemon";
 
@@ -12,21 +13,45 @@ class SignIn extends React.Component {
     super(props);
     
     this.state = {
-      username: '',
+      email: '',
       password: '',
     };
   } 
 
-  onSignIn() {
-    const { username, password } = this.state;
+  // Options to Login or Signup
+  static navigationOptions = {
+    title: 'Please sign in or SignUp',
+  };
 
-    if(username == "admin" && password == "admin"){
-      this.props.navigation.navigate('Home')
-    }else{
-      Alert.alert('Credential err', `${username} + ${password}` +'use : admin - admin');
+   // validate if session exist
+  _signInAsync = async () => {
+    const { email, password } = this.state;
+    //save data with asyncstorage
+    try {
+     if(email !== "" && password !== ""){
+      let loginDetails = await AsyncStorage.getItem('loginDetails');
+          let ld = JSON.parse(loginDetails); 
+          if (ld.email != null && ld.password != null)
+          {
+              if (ld.email == email && ld.password == password)
+              {
+                this.props.navigation.navigate('Home');  
+              }
+              else
+              {
+                  alert('Email and Password does not exist!');
+              }
+          }
+      }else{
+        Alert.alert('Credential err: Email And Pass is required')
+          console.log('error SigninUP!: ' + email)
+      }
+    } catch (err) {
+      console.log('error signing up: ', err)
+      Alert.alert('Credential err. Email and Password is Required');
     }
 
-  }
+  };
   
 
   render() {
@@ -34,9 +59,9 @@ class SignIn extends React.Component {
     return (
       <View style={styles.container} title="SIGN IN">
       <TextInput
-        value={this.state.username}
-        onChangeText={(username) => this.setState({ username })}
-        placeholder={'Username'}
+        value={this.state.email}
+        onChangeText={(email) => this.setState({ email })}
+        placeholder={'Email'}
         style={styles.input}
       />
       <TextInput
@@ -51,8 +76,16 @@ class SignIn extends React.Component {
       buttonStyle={{ marginTop: 20 }}
       backgroundColor="#03A9F4"
       title="SIGN IN"
-      onPress={() => this.onSignIn()}
+      onPress={() => this._signInAsync()}
     />
+    <Text>If you are not register please click on button to SignUp</Text>
+    <Button 
+      buttonStyle={{ marginTop: 20 }}
+      backgroundColor="#03A9F4"
+      title="SIGN UP"
+      onPress={() => this.props.navigation.navigate('SignUp')}
+    />
+
   </View>
     );
   }
@@ -67,18 +100,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#ecf0f1',
   },
   input: {
-    width: 200,
-    height: 44,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: 'black',
-    marginBottom: 10,
+    width: 350,
+    height: 55,
+    backgroundColor: '#42A5F5',
+    margin: 10,
+    padding: 8,
+    color: 'white',
+    borderRadius: 14,
+    fontSize: 18,
+    fontWeight: '500',
   },
 });
 
 const AppNavigator = createStackNavigator({
   SignIn: {
     screen: SignIn
+  },
+  SignUp: {
+    screen: SignUp
   },
   Home: {
     screen: Home

@@ -1,9 +1,9 @@
 import React, { PureComponent } from 'react'; 
 //import UI from react-native
-import { View, Text, Image, Alert } from 'react-native';
+import { View, Text, Image, AsyncStorage, Button } from 'react-native';
 //import styles for component.
 import { StyleSheet } from 'react-native';
-import { getTimeFieldValues } from 'uuid-js';
+
 
 
 //Define your class component
@@ -20,6 +20,12 @@ export default class Pokemon extends PureComponent {
         }
        
       }
+
+      _signOutAsync = async () => {
+        await AsyncStorage.clear();
+        const { navigation } = this.props;
+        navigation.navigate('SignIn');        
+      };
 
       async getpokeHeiWei(idPok) {
         try {
@@ -55,6 +61,7 @@ export default class Pokemon extends PureComponent {
                 <Text style={styles.nameOfPokemon}>Height: {this.state.height}</Text>
                 <Text style={styles.nameOfPokemon}>Weight: {this.state.weight}</Text>
                 <Text style={styles.nameOfPokemon}>Types: {this.state.types}</Text>
+                <Button title="Sign Out" onPress={this._signOutAsync} />
             </View>
         );
     }

@@ -10,7 +10,7 @@ export default class Home extends React.Component {
     super(props);   
 
     this.state = {
-      //Assing a array to your pokeList state
+      //Assing a array to pokeList state
       pokeList: [],
       //Have a loading state where when data retrieve returns data. 
       loading: true
